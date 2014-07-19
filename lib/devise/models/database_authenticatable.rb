@@ -69,7 +69,7 @@ module Devise
         password              = params[:password]
         
 
-        result = if !current_password.blank? and !password.blank? and !password_confirmation.blank? and valid_password?(current_password)
+        result = if !current_password.blank? and !password.blank? and !password_confirmation.blank? and valid_password?(current_password) and is_long_password?(password) and is_secure_password?(password)
           update_attributes(params, *options)
         else
           self.assign_attributes(params, *options)
@@ -83,6 +83,13 @@ module Devise
             
           if password.blank?
             self.errors.add(:password, :blank)
+          else
+            if !is_secure_password?(password)
+              errors.add(:password, "Password must contain at least 1 lower case character, 1 upper case character and a number")
+            end
+            if !is_long_password?(password)
+              errors.add(:password, "Password must be at least 10 characters long")
+            end
           end
           if !password.blank? and password != password_confirmation
             self.errors.add(:password_confirmation, :invalid)
@@ -90,9 +97,22 @@ module Devise
 
           false
         end
-
         clean_up_passwords
         result
+      end
+
+      def is_secure_password?(password)
+        if password and !(/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/.match(password))
+          return false
+        end
+        true
+      end
+
+      def is_long_password?(password)
+        if password and password.length < 10
+          return false
+        end    
+        true
       end
 
       # Updates record attributes without asking for the current password.
