@@ -44,7 +44,7 @@ module Devise
 
       # Verifies whether an password (ie from sign in) is the user password.
       def valid_password?(password)
-        return false if encrypted_password.blank?
+        return false if encrypted_password.blank? 
         bcrypt   = ::BCrypt::Password.new(encrypted_password)
         password = ::BCrypt::Engine.hash_secret("#{password}#{self.class.pepper}", bcrypt.salt)
         Devise.secure_compare(password, encrypted_password)
@@ -75,14 +75,18 @@ module Devise
           self.assign_attributes(params, *options)
           self.valid?
           
-          self.errors.add(:current_password, current_password.blank? ? :blank : :invalid)
+          if current_password.blank?
+            self.errors.add(:current_password, :blank)
+          elsif !valid_password?(current_password)
+            self.errors.add(:current_password, :invalid)
+          end
+            
           if password.blank?
             self.errors.add(:password, :blank)
           end
-          if password and password != password_confirmation
+          if !password.blank? and password != password_confirmation
             self.errors.add(:password_confirmation, :invalid)
           end
-
 
           false
         end
