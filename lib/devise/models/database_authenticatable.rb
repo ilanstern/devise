@@ -69,7 +69,7 @@ module Devise
         password              = params[:password]
         
 
-        result = if !current_password.blank? and !password.blank? and !password_confirmation.blank? and is_password_new?(password) and valid_password?(current_password) and is_long_password?(password) and is_secure_password?(password)
+        result = if !current_password.blank? and !password.blank? and !password_confirmation.blank? and is_password_new?(password) and valid_password?(current_password) and is_long_password?(password) and is_secure_password?(password) and password == password_confirmation
           update_attributes(params, *options)
         else
           self.assign_attributes(params, *options)
