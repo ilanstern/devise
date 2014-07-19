@@ -63,19 +63,27 @@ module Devise
       # their password). In case the password field is rejected, the confirmation
       # is also rejected as long as it is also blank.
       def update_with_password(params, *options)
-        current_password = params.delete(:current_password)
+        current_password      = params.delete(:current_password)
+        password_confirmation = params.delete(:password_confirmation)
 
-        if params[:password].blank?
-          params.delete(:password)
-          params.delete(:password_confirmation) if params[:password_confirmation].blank?
-        end
+        password              = params[:password]
+        
 
-        result = if valid_password?(current_password)
+        result = if !current_password.blank? and !password.blank? and !password_confirmation.blank? and valid_password?(current_password)
           update_attributes(params, *options)
         else
           self.assign_attributes(params, *options)
           self.valid?
+          
           self.errors.add(:current_password, current_password.blank? ? :blank : :invalid)
+          if password.blank?
+            self.errors.add(:password, :blank)
+          end
+          if password and password != password_confirmation
+            self.errors.add(:password_confirmation, :invalid)
+          end
+
+
           false
         end
 
