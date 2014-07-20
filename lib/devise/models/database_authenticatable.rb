@@ -118,7 +118,7 @@ module Devise
       end
 
       def is_password_new?(password)
-        valid_password?(password)
+        !valid_password?(password)
       end
 
       # Updates record attributes without asking for the current password.
