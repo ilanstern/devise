@@ -79,22 +79,22 @@ module Devise
             self.errors.add(:current_password, :blank)
           elsif !valid_password?(current_password)
             self.errors.add(:current_password, :invalid)
-          end
-            
-          if password.blank?
-            self.errors.add(:password, :blank)
-          elsif !is_password_new?(password)
-            errors.add(:password, "New password must be different from old one")
           else
-            if !is_secure_password?(password)
-              errors.add(:password, "Password must contain at least 1 lower case character, 1 upper case character and a number")
+            if password.blank?
+              self.errors.add(:password, :blank)
+            elsif !is_password_new?(password)
+              errors.add(:password, "New password must be different from old one")
+            else
+              if !is_secure_password?(password)
+                errors.add(:password, "Password must contain at least 1 lower case character, 1 upper case character and a number")
+              end
+              if !is_long_password?(password)
+                errors.add(:password, "Password must be at least 10 characters long")
+              end
             end
-            if !is_long_password?(password)
-              errors.add(:password, "Password must be at least 10 characters long")
+            if !password.blank? and password != password_confirmation
+              self.errors.add(:password_confirmation, :invalid)
             end
-          end
-          if !password.blank? and password != password_confirmation
-            self.errors.add(:password_confirmation, :invalid)
           end
 
           false
